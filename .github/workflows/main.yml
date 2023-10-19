@@ -32,3 +32,14 @@ jobs:
           name: DocGenerator
           if-no-files-found: error
           retention-days: 5
+          
+  provenance:
+    needs: [build]
+    permissions:
+      id-token: write # For signing.
+      contents: write # For asset uploads.
+      actions: read # For the entrypoint.
+    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@main
+    with:
+      base64-subjects: "${{ needs.build.outputs.hashes }}"
+      compile-generator: true
