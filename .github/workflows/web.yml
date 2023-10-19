@@ -1,0 +1,32 @@
+name: container
+
+on:
+  push:
+    tags:        
+      - v1             # Push events to v1 tag
+      - v1.*           # Push events to v1.0, v1.1, and v1.9 tags
+  workflow_dispatch:
+    
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Login to GitHub
+        uses: docker/login-action@v1.9.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: build+push
+        uses: docker/build-push-action@v2.7.0
+        with:
+          context: ./docwebgen
+          push: true
+          tags: ghcr.io/raoulholzer/docwebgen:latest
